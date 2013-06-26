@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Matrix like animation</title>
+    <style type="text/css">
+      html {
+        background-color: black;
+        font-family: monospace;
+        font-size: 16px;
+        color: white;
+      }
+      .character {
+        position: fixed;
+        top: -20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="characters"></div>
+    <script type="text/javascript">
+      /* Initialization */
+      var containerElement = document.getElementById("characters");
+	
+      /* Geometry */
+      var colSpace         = 10;  /* Space between colons */
+
+      /* Intervals */
+      var insertInterval   = 0;   /* Time between character inserts */
+      var fallInterval     = 40;  /* Time between falls */
+      var swapInterval     = 100; /* Time between character swapps */
+
+      /* Fall parameters */
+      var numberOfSpeeds   = 10;  /* Total number of speeds */
+      var minSpeed         = 5;   /* Minimum number of pixels to fall per frame */
+      var speedMultiplier  = 2;   /* Sets gap between speeds */
+	
+      function genRndChar(){
+        return String.fromCharCode(Math.round(1000 + Math.random() * 100));
+      }
+
+      function genRndHexGreen(){
+        return "#00" + (Math.round(16 + Math.random() * 239).toString(16)) + "00";
+      }
+
+      /* Add characters */
+      setInterval(function(){
+        /* Generate a random horizontal position for the next character */
+        var XPosition = Math.round(Math.random() * window.innerWidth);
+        XPosition = XPosition - XPosition % colSpace; /* TODO improve math */
+
+        var divToInsert = document.createElement("div");
+        divToInsert.setAttribute("class", "character");
+        divToInsert.dataset.speed =  Math.round(Math.random() * numberOfSpeeds);
+        divToInsert.textContent = genRndChar();
+        divToInsert.style.left = XPosition + "px";
+        divToInsert.style.color = genRndHexGreen();
+        containerElement.appendChild(divToInsert);
+      }, insertInterval);
+
+      /* Move characters downwards */
+      setInterval(function(){
+        for (var i = 0; i < containerElement.childNodes.length; i++){
+          var currentY = parseInt(window.getComputedStyle(containerElement.childNodes[i]).top);
+          containerElement.childNodes[i].style.top = currentY + parseInt(containerElement.childNodes[i].dataset.speed) * speedMultiplier + minSpeed + "px";
+          /* Remove if character is invisible */
+          if (currentY > window.innerHeight){
+            containerElement.childNodes[i].remove();
+          }
+        }
+      }, fallInterval);
+
+      /* Swap characters */
+      setInterval(function(){
+        for (var i = 0; i < containerElement.childNodes.length; i++){
+          containerElement.childNodes[i].textContent = genRndChar();
+        }
+      }, swapInterval);
+    </script>
+  </body>
+</html>
